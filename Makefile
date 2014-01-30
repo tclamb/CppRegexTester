@@ -34,8 +34,7 @@ $(EXECUTABLE): $(OBJECTS) node.native json11
 %.o: %.cpp
 	clang++ $(CXXFLAGS) $(INCLUDES) -c -o $@ $<
 
-json11:
-	clang++ $(CXXFLAGS) -c -o $(JSON11_PATH)/json11.o $(JSON11_PATH)/json11.cpp
+json11: $(JSON11_PATH)/json11.o
 
 node.native:
 	$(MAKE) -C $(LIBUV_PATH) >/dev/null 2>/dev/null
