@@ -14,8 +14,12 @@ LIBUV_NAME=libuv.a
 NODE_NATIVE_INCLUDES=-I$(LIBUV_PATH)/include -I$(HTTP_PARSER_PATH) -I$(NODE_NATIVE_PATH) 
 NODE_NATIVE_LIBS=$(HTTP_PARSER_PATH)/http_parser.o $(LIBUV_PATH)/$(LIBUV_NAME) $(RTLIB) -lm -lpthread
 
-INCLUDES=$(NODE_NATIVE_INCLUDES)
-LIBS=$(NODE_NATIVE_LIBS) $(PLATFORM_LIBS)
+JSON11_PATH=vendor/json11
+JSON11_INCLUDES=-I$(JSON11_PATH)
+JSON11_LIBS=$(JSON11_PATH)/json11.o
+
+INCLUDES=$(NODE_NATIVE_INCLUDES) $(JSON11_INCLUDES)
+LIBS=$(NODE_NATIVE_LIBS) $(PLATFORM_LIBS) $(JSON11_LIBS)
 
 SOURCES=regex_tester.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
@@ -24,11 +28,14 @@ EXECUTABLE=regex_tester
 
 build: $(EXECUTABLE)
 
-$(EXECUTABLE): $(OBJECTS) node.native
+$(EXECUTABLE): $(OBJECTS) node.native json11
 	clang++ $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 %.o: %.cpp
 	clang++ $(CXXFLAGS) $(INCLUDES) -c -o $@ $<
+
+json11:
+	clang++ $(CXXFLAGS) -c -o $(JSON11_PATH)/json11.o $(JSON11_PATH)/json11.cpp
 
 node.native:
 	$(MAKE) -C $(LIBUV_PATH) >/dev/null 2>/dev/null
@@ -39,4 +46,5 @@ clean:
 	$(MAKE) -C $(HTTP_PARSER_PATH) clean
 	rm -f $(LIBUV_PATH)/$(LIBUV_NAME)
 	rm -f $(HTTP_PARSER_PATH)/http_parser.o
+	rm -f $(JSON11_PATH)/json11.o
 	rm -f $(OBJECTS) $(EXECUTABLE)
