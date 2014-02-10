@@ -95,9 +95,9 @@ int main() {
     int port = 8080;
 
     router r;
-    r.add_handle("/", [](request& req, response& res){ serve_file(req, res, "index.html"); });
+    r.add_handle("/", [](request& req, response& res){ serve_file(req, res, "pub/index.html"); });
     r.add_handle("/regex", regex_tester);
-    r.add_handle("/assets/.*", [](request& req, response& res){ serve_file(req, res, req.url().path().substr(1)); });
+    r.add_handle("/.*", [](request& req, response& res){ serve_file(req, res, "pub/" + req.url().path().substr(1)); });
 
     if (!server.listen("0.0.0.0", port, r)) {
         return -1;
